@@ -1,7 +1,16 @@
-# CARD — Causal Ablation of Residual Directions
+# Res-Lens
 
-Tools for asking **where a transformer makes a binary decision, and whether that decision
-causally depends on a single direction in its internal state.**
+**A lens on the residual stream — and a scalpel for it.**
+
+Two things in one toolkit:
+
+- **the lens** — where in a transformer's residual stream a binary decision forms, and
+  whether the separating direction is a principal axis of the representation
+- **the scalpel** — whether that decision *causally depends* on that direction, tested by
+  editing it out of the weights and measuring what breaks
+
+The second is the point. The first describes where things sit; only an intervention shows
+dependence.
 
 Written for character-level [nanoGPT](https://github.com/karpathy/nanoGPT)-style models that
 classify pairs of sequences, but the method applies to any decoder-only transformer with a
