@@ -85,6 +85,22 @@ specificity gap = performance(random direction) − performance(class direction)
 A large positive gap means the collapse is specific to the class direction. A gap near zero
 means you measured generic damage, and the honest move is to say so.
 
+### The second control — specificity of *function*
+
+There is a further objection the random-direction control does **not** answer: `v` is
+*defined* as the class-mean difference, so removing it and finding the classes no longer
+separate has a tautological flavour.
+
+`collateral.py` addresses it. It measures, alongside task performance, whether **general
+next-token modelling survives the edit** — `KL(original ‖ ablated)` at ordinary sequence
+positions, with the decision position excluded.
+
+A purely algebraic deletion of the separating axis carries **no prediction** about what
+happens to everything else. If the task collapses while general modelling is essentially
+untouched, the damage is confined to one *function* — which cannot be obtained by
+construction. If general modelling degrades comparably, you broke the model and should say
+so.
+
 ---
 
 ## Scripts
@@ -99,6 +115,7 @@ means you measured generic damage, and the honest move is to say so.
 | `pooled_projection.py` | pools replicates into one projection per layer; reports whether it separates by **class** or by **model identity** |
 | `figures_combined.py` | combined class-only figures, light and dark |
 | `error_margin.py` | is model error predictable from geometry, beyond the decision variable itself? |
+| `collateral.py` | does the edit break the **decision** or the **model**? task damage vs general next-token KL |
 
 Each writes figures (300 dpi PNG + vector PDF), a `metrics.json`, and where relevant a
 `.csv`. Every plotted number is recomputed from the inputs.
