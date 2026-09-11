@@ -103,6 +103,18 @@ so.
 
 ---
 
+## Necessity and sufficiency
+
+`ablate.py` removes `v` and asks whether discrimination dies — **necessity**.
+`steer.py` adds `±αv` and asks whether the decision *moves* — **sufficiency**. Together
+they are the standard causal pair; ablation alone gives only half.
+
+Steering carries its own trap: a large `α` pins the output regardless of input, which is a
+broken model, not control. `steer.py` therefore reports the operating point **and** AUROC at
+every `α`, and computes its verdict over a **usable window** — the range where both the
+random control and `v`'s own ranking stay near baseline. Expect the window to be narrow;
+outside it, saturation.
+
 ## Scripts
 
 | script | what it does |
@@ -116,6 +128,7 @@ so.
 | `figures_combined.py` | combined class-only figures, light and dark |
 | `error_margin.py` | is model error predictable from geometry, beyond the decision variable itself? |
 | `collateral.py` | does the edit break the **decision** or the **model**? task damage vs general next-token KL |
+| `steer.py` | adds `±αv` instead of removing it — **sufficiency**, with a saturation check |
 
 Each writes figures (300 dpi PNG + vector PDF), a `metrics.json`, and where relevant a
 `.csv`. Every plotted number is recomputed from the inputs.
