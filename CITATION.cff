@@ -1,0 +1,43 @@
+cff-version: 1.2.0
+title: "Res-Lens: a lens on the residual stream — and a scalpel for it"
+message: "If you use or modify any part of this software, please cite it."
+type: software
+authors:
+  - family-names: "Salehi Ashtiani"
+    given-names: "Kourosh"
+    email: "kourosh.salehi.ashtiani@gmail.com"
+repository-code: "https://github.com/kouroshSA/Res-Lens"
+license: CC-BY-NC-4.0
+abstract: >-
+  Tools for locating where a decoder-only transformer makes a binary decision in
+  its residual stream, and causally testing whether that decision depends on a
+  single direction — by ablating the direction out of the weights (necessity) and
+  by steering along it (sufficiency), each with matched random-direction controls.
+keywords:
+  - interpretability
+  - residual stream
+  - directional ablation
+  - activation steering
+  - protein language model
+  - nanoGPT
+references:
+  - type: article
+    title: "Refusal in language models is mediated by a single direction"
+    authors:
+      - family-names: Arditi
+        given-names: Andy
+      - family-names: Obeso
+        given-names: Oscar
+      - family-names: Syed
+        given-names: Aaquib
+      - family-names: Paleka
+        given-names: Daniel
+      - family-names: Panickssery
+        given-names: Nina
+      - family-names: Gurnee
+        given-names: Wes
+      - family-names: Nanda
+        given-names: Neel
+    year: 2024
+    url: "https://arxiv.org/abs/2406.11717"
+    notes: "Origin of the directional-ablation operator implemented here."

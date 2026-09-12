@@ -186,7 +186,40 @@ afterwards; expect to edit paths and module names.
 Results obtained with these tools are reported separately (manuscript in preparation) and
 are not included here.
 
-> **No licence file is present yet.** That is a deliberate omission for the repository owner
-> to decide. Without one, default copyright applies and others have no permission to reuse
-> the code. The choice is unconstrained, since this is not a derivative work of any
-> copyleft source.
+## Licence and citation
+
+**[CC BY-NC 4.0](LICENSE)** — Creative Commons Attribution-NonCommercial 4.0 International.
+
+You may **use, modify and redistribute** this code, including for academic research, on two
+conditions:
+
+- **Non-commercial only.** Use primarily intended for or directed toward commercial
+  advantage or monetary compensation is not permitted under this licence. For commercial
+  use, contact the author.
+- **Attribution.** If you use or modify any part of this repository, you must give
+  appropriate credit, link to the licence, and indicate whether changes were made.
+
+Provided **as-is, without warranties of any kind**, and the author accepts **no liability**
+for any use or misuse (LICENSE §5).
+
+### How to cite
+
+Machine-readable metadata is in [`CITATION.cff`](CITATION.cff); GitHub renders a
+"Cite this repository" button from it. In text:
+
+> Salehi Ashtiani, K. *Res-Lens: a lens on the residual stream — and a scalpel for it.*
+> https://github.com/kouroshSA/Res-Lens (CC BY-NC 4.0).
+
+If you use the ablation or steering operator, please also cite its origin — Arditi et al.,
+*Refusal in language models is mediated by a single direction*, arXiv:2406.11717 (2024).
+
+> **Two notes, offered as information rather than legal advice.** (1) A non-commercial
+> licence is **not** OSI-approved open source; some institutions and downstream projects
+> decline such dependencies, which is a real cost to adoption if you later want uptake.
+> (2) Creative Commons does not itself recommend CC licences for software, since they do
+> not address source/object distinction or patent grants. It was chosen here because it
+> matches the stated requirements — non-commercial, attribution mandatory, no warranty, no
+> liability — more directly than any software licence does.
+> [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)
+> is the software-native alternative, but it does **not** legally require citation; it
+> would make attribution a request rather than a condition. Swapping is a one-file change.
