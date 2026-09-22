@@ -149,10 +149,10 @@ def main():
     for m in MODELS:
         it = picks[m]
         rd = rroot / f"{m}_iter{it}"
-        if not (rd / "a_residuals.pt").exists():
+        if not (rd / "prs_residuals.pt").exists():
             print(f"[skip] {m}"); continue
-        a_res = torch.load(rd / "a_residuals.pt").numpy()
-        b_res = torch.load(rd / "b_residuals.pt").numpy()
+        a_res = torch.load(rd / "prs_residuals.pt").numpy()
+        b_res = torch.load(rd / "rrs_residuals.pt").numpy()
         stoi = pickle.load(open(root / m / "meta.pkl", "rb"))["stoi"]
         tok1 = stoi["1"]
         a_lines = E.read_lines(root / m / "eval_sets/PRS-RRS" / f"PRS-{m}.csv")
