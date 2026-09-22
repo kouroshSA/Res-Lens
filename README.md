@@ -143,8 +143,11 @@ outside it, saturation.
 | `collateral.py` | does the edit break the **decision** or the **model**? task damage vs general next-token KL |
 | `steer.py` | adds `±αv` via forward hooks — **edits activations only**; sufficiency, with a saturation check |
 
-Each writes figures (300 dpi PNG + vector PDF), a `metrics.json`, and where relevant a
-`.csv`. Every plotted number is recomputed from the inputs.
+Each writes figures as **PNG + vector PDF** (300 dpi, except the multi-panel grids in
+`pooled_projection.py` and `figures_combined.py`, which use 200/220 dpi to keep large grids
+a sane file size), a **JSON metrics file** (the name varies per script —
+`metrics.json`, `ablation_metrics.json`, `steering.json`, …), and where relevant a `.csv`.
+Every plotted number is recomputed from the inputs.
 
 **See [`USAGE.md`](USAGE.md)** for run order, arguments, sanity checks and a pitfalls
 section.
@@ -157,8 +160,31 @@ Class names in the code are **PRS** and **RRS** (positive / random reference set
 protein-interaction vocabulary). They are just labels for "class A" and "class B"; the method
 is agnostic to what they mean.
 
-To port: change the module names in `ablate.py::ablate_`, the hook targets in
-`residual_extract.py::ResidualCatcher`, and the readout in the scoring functions.
+### Porting checklist
+
+Model-specific names appear in **five** files, not one. Editing only `ablate.py` leaves the
+others silently wrong — `collateral.py` and `splithalf.py` carry their own copies of the
+weight-edit and snapshot/restore helpers.
+
+| file | what to change |
+|---|---|
+| `residual_extract.py` | `ResidualCatcher` — the hook targets (`transformer.drop`, `transformer.h[i]`) |
+| `ablate.py` | `ablate_()` — the residual-writing projections (`block.attn.c_proj`, `block.mlp.c_proj`) |
+| `splithalf.py` | its own `ablate()`, `snapshot()`, `restore()` — same projections |
+| `collateral.py` | its own `ablate()`, `snapshot()`, `restore()` — same projections |
+| `steer.py` | `Steerer` — the blocks it hooks (`transformer.h`) |
+
+Also change the readout in each script's `score()` / `evaluate()` if your decision is not
+"softmax at the final position, probability of one token".
+
+For Llama-style models the projections are usually `self_attn.o_proj` and `mlp.down_proj`,
+and the block list is `model.layers`.
+
+A quick check that you got them all:
+
+```bash
+grep -rn "c_proj\|transformer\.h\|transformer\.drop" *.py
+```
 
 ---
 
