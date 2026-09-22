@@ -7,7 +7,7 @@ authors:
     given-names: "Kourosh"
     email: "kourosh.salehi.ashtiani@gmail.com"
 repository-code: "https://github.com/kouroshSA/Res-Lens"
-license: CC-BY-NC-4.0
+license-url: "https://github.com/kouroshSA/Res-Lens/blob/main/LICENSE.md"
 abstract: >-
   Tools for locating where a decoder-only transformer makes a binary decision in
   its residual stream, and causally testing whether that decision depends on a

@@ -188,38 +188,41 @@ are not included here.
 
 ## Licence and citation
 
-**[CC BY-NC 4.0](LICENSE)** — Creative Commons Attribution-NonCommercial 4.0 International.
+**[PolyForm Noncommercial License 1.0.0](LICENSE.md)**, with Additional Terms.
 
-You may **use, modify and redistribute** this code, including for academic research, on two
-conditions:
+You may **use, modify and redistribute** this code, including for academic research, on
+these conditions:
 
-- **Non-commercial only.** Use primarily intended for or directed toward commercial
-  advantage or monetary compensation is not permitted under this licence. For commercial
-  use, contact the author.
-- **Attribution.** If you use or modify any part of this repository, you must give
-  appropriate credit, link to the licence, and indicate whether changes were made.
+- **Noncommercial only.** Commercial use requires a separate licence from the copyright
+  holder. PolyForm defines permitted noncommercial purposes precisely — see
+  *Noncommercial Purposes*, *Personal Uses* and *Noncommercial Organizations* in
+  [`LICENSE.md`](LICENSE.md).
+- **Citation is mandatory, not a courtesy.** Additional Term 1 makes it a condition of the
+  licence: any use of the software or any part or derivative of it — in research, software,
+  products, publications, presentations, or models built with its help — must credit the
+  project and cite this repository. Academic works must cite using
+  [`CITATION.cff`](CITATION.cff).
+- **Licence propagation.** Every copy, fork or derivative must carry the whole
+  `LICENSE.md` unaltered, including the `Required Notice:` lines (Additional Term 2).
 
-Provided **as-is, without warranties of any kind**, and the author accepts **no liability**
-for any use or misuse (LICENSE §5).
+Provided **as-is, with no warranty or condition of any kind**, and the licensor accepts
+**no liability** for any damages arising from the software or its use or misuse
+(*No Liability*, `LICENSE.md`).
 
 ### How to cite
 
-Machine-readable metadata is in [`CITATION.cff`](CITATION.cff); GitHub renders a
-"Cite this repository" button from it. In text:
+> Salehi-Ashtiani, K. *Res-Lens: a lens on the residual stream — and a scalpel for it.*
+> https://github.com/kouroshSA/Res-Lens
 
-> Salehi Ashtiani, K. *Res-Lens: a lens on the residual stream — and a scalpel for it.*
-> https://github.com/kouroshSA/Res-Lens (CC BY-NC 4.0).
+Machine-readable metadata is in [`CITATION.cff`](CITATION.cff); GitHub renders a
+"Cite this repository" button from it.
 
 If you use the ablation or steering operator, please also cite its origin — Arditi et al.,
 *Refusal in language models is mediated by a single direction*, arXiv:2406.11717 (2024).
 
-> **Two notes, offered as information rather than legal advice.** (1) A non-commercial
-> licence is **not** OSI-approved open source; some institutions and downstream projects
-> decline such dependencies, which is a real cost to adoption if you later want uptake.
-> (2) Creative Commons does not itself recommend CC licences for software, since they do
-> not address source/object distinction or patent grants. It was chosen here because it
-> matches the stated requirements — non-commercial, attribution mandatory, no warranty, no
-> liability — more directly than any software licence does.
-> [PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)
-> is the software-native alternative, but it does **not** legally require citation; it
-> would make attribution a request rather than a condition. Swapping is a one-file change.
+> **Note.** PolyForm Noncommercial is a software-native licence, better drafted for code
+> than a Creative Commons licence, but it is **not** OSI-approved open source. Some
+> institutions and downstream projects decline non-commercial dependencies; that is a real
+> cost to adoption, accepted deliberately here. PolyForm alone does not require citation —
+> the Additional Terms in `LICENSE.md` add that obligation.
+
