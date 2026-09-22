@@ -37,38 +37,51 @@ dependence.
 
 ---
 
-## What "ablating a direction" means
+## Two spaces, two interventions — do not conflate them
 
-Easy to misread, so plainly:
+The direction `v` and the *edit* live in different places, and the toolkit does both kinds
+of edit. This trips people up, so it is stated explicitly:
 
-**It is not a token, a word, or an embedding.** Nothing is removed from the vocabulary and
-**the embedding table is never modified.**
+| | where `v` comes from | what the intervention changes | scripts |
+|---|---|---|---|
+| **ablation** | activations | **model weights**, permanently | `ablate.py`, `splithalf.py`, `collateral.py` |
+| **steering** | activations | **activations at run time**, weights untouched | `steer.py` |
 
-**It is a direction in activation space.** Average the residual stream over many class-A
-inputs, average over many class-B inputs, subtract:
+**`v` is always derived from activations.** Run the model over many class-A inputs and
+many class-B inputs, average the residual stream at the readout position, and subtract:
 
 ```
 v = normalize( mean(class A) − mean(class B) )
 ```
 
 Individual inputs average out; what survives is the axis along which the model separates the
-two classes.
+two classes. `v` is *not* read off the weights, and it is *not* a token or an embedding —
+nothing is removed from the vocabulary and **the embedding table is never modified**.
 
-**The edit removes the model's ability to write along that axis.** Each block writes into the
-residual stream through projection matrices. Replacing `W` with `(I − v vᵀ)W` leaves them
-able to compute everything else, but their output has exactly zero component along `v`.
-Later layers never see the feature.
+**Ablation edits weights.** Each block writes into the residual stream through projection
+matrices. Replacing `W` with `(I − v vᵀ)W` leaves them able to compute everything else, but
+their output has exactly zero component along `v`, so later layers never see the feature:
 
 ```
 W  ←  W − λ · v (vᵀ W)          λ = 1  ⇒  (I − v vᵀ) W
 ```
 
-No retraining, no gradients — one rank-1 edit per matrix.
+No retraining, no gradients — one rank-1 edit per matrix, applied to every block. The change
+is persistent: the modified model is a different model on disk. `splithalf.py` and
+`collateral.py` snapshot the original weights and restore them between conditions.
 
-Because a *learned feature computed from the whole input* is removed rather than a lexical
-item, the intervention generalises to inputs never used to compute `v` — which `splithalf.py`
-tests directly. And because one direction out of `d_model` is removed, collateral damage is
-small.
+**Steering edits activations.** `steer.py` adds `α·v` to the residual stream through forward
+hooks, at the readout position only. **No weight is modified**; removing the hooks restores
+the original model exactly.
+
+```
+h  ←  h + α · v
+```
+
+Because a *learned feature computed from the whole input* is removed (or added) rather than
+a lexical item, the intervention generalises to inputs never used to compute `v` — which
+`splithalf.py` tests directly. And because one direction out of `d_model` is touched,
+collateral damage is small — which `collateral.py` measures.
 
 ---
 
@@ -120,15 +133,15 @@ outside it, saturation.
 | script | what it does |
 |---|---|
 | `residual_extract.py` | hooks the residual stream at every layer at the readout position; per-layer silhouette, class-mean cosine, variance fraction along `v`, \|cos(v, PC1)\|, PaCMAP panels |
-| `ablate.py` | the causal ablation, with random-direction and PC1 controls and a λ sweep |
-| `splithalf.py` | estimates `v` on one half, ablates, evaluates on the other — the circularity control |
+| `ablate.py` | causal ablation — **edits weights**; random-direction and PC1 controls, λ sweep |
+| `splithalf.py` | estimates `v` on one half, ablates (weights), evaluates on the other — circularity control |
 | `aggregate_geometry.py` | cross-model layer curves and per-model tables |
 | `aggregate_ablation.py` | cross-model ablation summary and specificity gaps |
 | `pooled_projection.py` | pools replicates into one projection per layer; reports whether it separates by **class** or by **model identity** |
 | `figures_combined.py` | combined class-only figures, light and dark |
 | `error_margin.py` | is model error predictable from geometry, beyond the decision variable itself? |
 | `collateral.py` | does the edit break the **decision** or the **model**? task damage vs general next-token KL |
-| `steer.py` | adds `±αv` instead of removing it — **sufficiency**, with a saturation check |
+| `steer.py` | adds `±αv` via forward hooks — **edits activations only**; sufficiency, with a saturation check |
 
 Each writes figures (300 dpi PNG + vector PDF), a `metrics.json`, and where relevant a
 `.csv`. Every plotted number is recomputed from the inputs.
