@@ -142,6 +142,7 @@ outside it, saturation.
 | `error_margin.py` | is model error predictable from geometry, beyond the decision variable itself? |
 | `collateral.py` | does the edit break the **decision** or the **model**? task damage vs general next-token KL |
 | `steer.py` | adds `±αv` via forward hooks — **edits activations only**; sufficiency, with a saturation check |
+| `selfcheck.py` | mechanical consistency checks — run after any edit, rename or port |
 
 Each writes figures as **PNG + vector PDF** (300 dpi, except the multi-panel grids in
 `pooled_projection.py` and `figures_combined.py`, which use 200/220 dpi to keep large grids
@@ -183,8 +184,18 @@ and the block list is `model.layers`.
 A quick check that you got them all:
 
 ```bash
-grep -rn "c_proj\|transformer\.h\|transformer\.drop" *.py
+python selfcheck.py
 ```
+
+`selfcheck.py` verifies the invariants that otherwise break **silently** — chiefly that the
+residual filenames the extractor writes are exactly the ones every consumer reads. A
+mismatch there does not crash: each script hits its `if not exists: continue` guard and the
+run finishes with no output and no error. It also checks cross-script imports resolve, that
+scripts sharing the weight-edit helpers agree on which projections they touch, and that
+every flag and script named in the docs actually exists.
+
+Run it after any edit, rename or port. Exit code is non-zero on failure, so it drops
+straight into CI or a pre-commit hook.
 
 ---
 
