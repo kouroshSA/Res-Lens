@@ -37,26 +37,38 @@ dependence.
 
 ---
 
-## Two spaces, two interventions — do not conflate them
+## First, what `v` is
 
-The direction `v` and the *edit* live in different places, and the toolkit does both kinds
-of edit. This trips people up, so it is stated explicitly:
+Everything in this toolkit turns on a single vector, written `v` throughout.
 
-| | where `v` comes from | what the intervention changes | scripts |
-|---|---|---|---|
-| **ablation** | activations | **model weights**, permanently | `ablate.py`, `splithalf.py`, `collateral.py` |
-| **steering** | activations | **activations at run time**, weights untouched | `steer.py` |
-
-**`v` is always derived from activations.** Run the model over many class-A inputs and
-many class-B inputs, average the residual stream at the readout position, and subtract:
+As a transformer reads its input it maintains a running internal summary — the **residual
+stream**, `d_model` numbers, updated by each block. Run the model over many **class-A**
+inputs and many **class-B** inputs, take that summary at the readout position, average each
+class, and subtract:
 
 ```
 v = normalize( mean(class A) − mean(class B) )
 ```
 
-Individual inputs average out; what survives is the axis along which the model separates the
-two classes. `v` is *not* read off the weights, and it is *not* a token or an embedding —
-nothing is removed from the vocabulary and **the embedding table is never modified**.
+Individual inputs average out. What survives is the **axis along which the model separates
+the two classes** — one direction in `d_model`-dimensional activation space.
+
+`v` is *not* read off the weights. It is *not* a token, a word, or an embedding — nothing is
+removed from the vocabulary and **the embedding table is never modified**. It is a learned
+feature the model computes from the whole input, which is why interventions on it generalise
+to inputs never used to compute it (`splithalf.py` tests exactly that).
+
+---
+
+## Two spaces, two interventions — do not conflate them
+
+`v` is always *derived from* activations. But the **edit** can land in either of two places,
+and this toolkit does both. That distinction trips people up, so it is stated explicitly:
+
+| | `v` derived from | what the intervention changes | persistent? | scripts |
+|---|---|---|---|---|
+| **ablation** | activations | **model weights** | yes — a different model on disk | `ablate.py`, `splithalf.py`, `collateral.py` |
+| **steering** | activations | **activations at run time** | no — remove the hooks and it is exact | `steer.py` |
 
 **Ablation edits weights.** Each block writes into the residual stream through projection
 matrices. Replacing `W` with `(I − v vᵀ)W` leaves them able to compute everything else, but
@@ -66,22 +78,19 @@ their output has exactly zero component along `v`, so later layers never see the
 W  ←  W − λ · v (vᵀ W)          λ = 1  ⇒  (I − v vᵀ) W
 ```
 
-No retraining, no gradients — one rank-1 edit per matrix, applied to every block. The change
-is persistent: the modified model is a different model on disk. `splithalf.py` and
-`collateral.py` snapshot the original weights and restore them between conditions.
+No retraining, no gradients — one rank-1 edit per matrix, applied to every block.
+`splithalf.py` and `collateral.py` snapshot the original weights and restore them between
+conditions.
 
 **Steering edits activations.** `steer.py` adds `α·v` to the residual stream through forward
-hooks, at the readout position only. **No weight is modified**; removing the hooks restores
-the original model exactly.
+hooks, at the readout position only. **No weight is modified.**
 
 ```
 h  ←  h + α · v
 ```
 
-Because a *learned feature computed from the whole input* is removed (or added) rather than
-a lexical item, the intervention generalises to inputs never used to compute `v` — which
-`splithalf.py` tests directly. And because one direction out of `d_model` is touched,
-collateral damage is small — which `collateral.py` measures.
+Because one direction out of `d_model` is touched, collateral damage is small — which
+`collateral.py` measures rather than assumes.
 
 ---
 
@@ -194,8 +203,26 @@ run finishes with no output and no error. It also checks cross-script imports re
 scripts sharing the weight-edit helpers agree on which projections they touch, and that
 every flag and script named in the docs actually exists.
 
-Run it after any edit, rename or port. Exit code is non-zero on failure, so it drops
-straight into CI or a pre-commit hook.
+Run it after any edit, rename or port. Exit code is non-zero on failure.
+
+### Pre-commit hook
+
+A hook is included that runs `selfcheck.py` and blocks the commit if it fails. Git hooks
+live in `.git/hooks/`, which is not version controlled, so the hook is committed under
+`hooks/` and activated with a one-time, per-clone command:
+
+```bash
+git config core.hooksPath hooks
+```
+
+Optionally point it at a specific interpreter (otherwise it tries `./.venv/bin/python`,
+then `python3` on PATH):
+
+```bash
+git config hooks.python /path/to/python
+```
+
+Bypass deliberately with `git commit --no-verify`.
 
 ---
 

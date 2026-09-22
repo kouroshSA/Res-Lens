@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Pre-commit hook: run selfcheck.py and block the commit if it fails.
+#
+# Git hooks live in .git/hooks/, which is NOT version controlled, so a hook placed
+# there would not survive a clone. This file is committed instead, and activated by
+# pointing git at this directory:
+#
+#     git config core.hooksPath hooks
+#
+# That is a one-time, per-clone command (see README).
+#
+# To bypass deliberately:   git commit --no-verify
+set -u
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root" || exit 0
+
+[ -f selfcheck.py ] || exit 0   # nothing to check
+
+# Prefer an explicitly configured interpreter, then a local venv, then PATH.
+py="$(git config --get hooks.python || true)"
+if [ -z "${py}" ]; then
+  for cand in ./.venv/bin/python ./venv/bin/python; do
+    [ -x "$cand" ] && { py="$cand"; break; }
+  done
+fi
+[ -z "${py}" ] && py="$(command -v python3 || command -v python || true)"
+
+if [ -z "${py}" ]; then
+  echo "pre-commit: no python interpreter found; skipping selfcheck." >&2
+  echo "            set one with:  git config hooks.python /path/to/python" >&2
+  exit 0
+fi
+
+echo "pre-commit: running selfcheck.py ..."
+if ! "$py" selfcheck.py; then
+  cat >&2 <<'MSG'
+
+pre-commit: selfcheck FAILED — commit blocked.
+
+These checks catch the failures that do not raise: a filename mismatch between
+what the extractor writes and what consumers read is swallowed by an exists()
+guard and produces an empty run with no error.
+
+Fix the reported problems, or bypass deliberately with:
+
+    git commit --no-verify
+
+MSG
+  exit 1
+fi
+
+exit 0
